@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: #191d21;
+    --color: #d3d3d3;
+    --muted: #6c757d;
+    --lightning: #fada5e;
+    --nostr: #8d45dd;
+    --black: #000;
+    --white: #fff;
+    --bg-success: #149e613d;
+    --fg-success: #35df8d;
+    --bg-error: #f5395e3d;
+    --fg-error: #ff7386;
+  }
+
+  @layer base {
+    body {
+      background-color: var(--background);
+      color: var(--color);
+    }
+
+    #content {
+      min-height: 85svh;
+    }
+
+    #banner {
+      transform: scale(.8);
+    }
+
+    @media (min-width: 768px) {
+      #content {
+        min-height: 90svh;
+      }
+
+      #banner {
+        transform: scale(1.0);
+      }
+    }
+
+    .figlet {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 144px;
+      @apply my-3;
+    }
+
+    a:hover {
+      @apply underline;
+    }
+}

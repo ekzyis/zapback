@@ -1,0 +1,19 @@
+package pages
+
+import (
+	"net/http"
+	"strconv"
+	"github.com/ekzyis/zapback/pages/components"
+)
+
+templ Error(code int) {
+	<html>
+		@components.Head()
+		<body class="container">
+			<div id="content" class="flex flex-col justify-center items-center">
+				@components.Figlet("random", strconv.Itoa(code))
+				<div class="font-mono mb-3">{ http.StatusText(code) }</div>
+			</div>
+		</body>
+	</html>
+}

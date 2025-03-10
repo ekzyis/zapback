@@ -1,0 +1,18 @@
+package pages
+
+import "github.com/ekzyis/zapback/pages/components"
+
+templ Index() {
+    <html>
+        @components.Head()
+        <body class="container">
+			<div id="content" class="flex flex-col justify-center items-center">
+                <div id="banner">
+                    @components.Figlet("slant", "zapback")
+                </div>
+                <a class="text-xl md:text-2xl my-3" href="/new">new game</a>
+                <a class="text-xl md:text-2xl my-3" href="/load">load game</a>
+            </div>
+        </body>
+    </html>
+}

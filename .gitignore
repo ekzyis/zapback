@@ -1,0 +1,5 @@
+.env
+zapback
+*_templ.go
+public/css/tailwind.css
+__livereload

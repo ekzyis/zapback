@@ -1,0 +1,35 @@
+package components
+
+import c "github.com/ekzyis/zapback/pages/context"
+
+templ Head() {
+	<head>
+		<title>zapback</title>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
+		<link rel="manifest" href="/site.webmanifest"/>
+		<link rel="stylesheet" href="/css/tailwind.css"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="theme-color" content="#191d21"/>
+		<meta
+			name="htmx-config"
+			content='{
+				"responseHandling": [
+						{ "code": "204", "swap": false },
+						{ "code": "[23]..", "swap": true },
+						{ "code": "[45]..", "swap": true, "error": true }
+				]
+			}'
+		/>
+		<script src="/js/htmx.js" integrity="sha384-AjJ8PRsVaowawSMNJuYhxWbcW/0vOGpORfI4EmV1WnIrAM7a27/CagZ3ZtjfcYh8" crossorigin="anonymous"></script>
+		if ctx.Value(c.Env) == "development" {
+			<script defer src="/js/livereload.js"></script>
+		}
+		<script type="text/javascript">
+			// helper functions
+			var $ = selector => document.querySelector(selector)
+		</script>
+	</head>
+}
