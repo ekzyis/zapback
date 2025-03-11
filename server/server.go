@@ -40,6 +40,9 @@ func New(sCtx Context) *Server {
 
 	s.GET("/", index(sCtx))
 
+	s.GET("/new", newGame(sCtx))
+	s.POST("/new", createGame(sCtx))
+
 	return s
 }
 

@@ -1,0 +1,29 @@
+package pages
+
+import "github.com/ekzyis/zapback/pages/components"
+
+templ NewGame() {
+    <html>
+        @components.Head()
+        <body class="container">
+			<div id="content" class="flex flex-col justify-center items-center">
+                <div id="banner-new">
+                    @components.Figlet("slant", "new game")
+                </div>
+                <form hx-post="/new">
+                    <div class="grid grid-cols-[auto_auto] gap-4 items-center">
+                        <label for="pool_amount">pool amount</label>
+                        <input
+                            id="pool_amount"
+                            name="pool_amount"
+                            type="number"
+                            class="my-3 p-2 border rounded" />
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit">submit</button>
+                    </div>
+                </form>
+            </div>
+        </body>
+    </html>
+}

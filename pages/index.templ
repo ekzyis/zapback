@@ -6,12 +6,17 @@ templ Index() {
     <html>
         @components.Head()
         <body class="container">
-			<div id="content" class="flex flex-col justify-center items-center">
+			<div
+                id="content"
+                class="flex flex-col justify-center items-center"
+                hx-target="#content"
+                hx-select="#content"
+            >
                 <div id="banner">
                     @components.Figlet("slant", "zapback")
                 </div>
-                <a class="text-xl md:text-2xl my-3" href="/new">new game</a>
-                <a class="text-xl md:text-2xl my-3" href="/load">load game</a>
+                <a class="text-xl md:text-2xl my-3" hx-get="/new">new game</a>
+                <a class="text-xl md:text-2xl my-3" hx-get="/load">load game</a>
             </div>
         </body>
     </html>

@@ -1,0 +1,17 @@
+package pages
+
+import (
+    "github.com/ekzyis/zapback/pages/components"
+    "github.com/ekzyis/zapback/lightning"
+)
+
+templ Invoice(invoice *lightning.Invoice) {
+    <html>
+        @components.Head()
+        <body class="container">
+			<div id="content" class="flex flex-col justify-center items-center">
+                @components.Invoice(invoice)
+            </div>
+        </body>
+    </html>
+}

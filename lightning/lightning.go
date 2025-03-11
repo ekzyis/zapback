@@ -1,6 +1,10 @@
 package lightning
 
-import "time"
+import (
+	"time"
+
+	decodepay "github.com/nbd-wtf/ln-decodepay"
+)
 
 type PaymentRequest string
 
@@ -18,4 +22,26 @@ type Invoice struct {
 	PaymentRequest string    `json:"paymentRequest"`
 	CreatedAt      time.Time `json:"createdAt"`
 	ConfirmedAt    time.Time `json:"confirmedAt"`
+	ExpiresAt      time.Time `json:"expiresAt"`
+	ExpiresIn      int
+}
+
+func DecodePaymentRequest(pr PaymentRequest) (*Invoice, error) {
+	decoded, err := decodepay.Decodepay(string(pr))
+	if err != nil {
+		return nil, err
+	}
+
+	expiresAt := time.Unix(int64(decoded.CreatedAt+decoded.Expiry), 0)
+	expiresIn := int(time.Until(expiresAt).Seconds())
+
+	return &Invoice{
+		PaymentHash:    decoded.PaymentHash,
+		Msats:          decoded.MSatoshi,
+		Description:    decoded.Description,
+		PaymentRequest: string(pr),
+		CreatedAt:      time.Unix(int64(decoded.CreatedAt), 0),
+		ExpiresAt:      expiresAt,
+		ExpiresIn:      expiresIn,
+	}, nil
 }

@@ -14,12 +14,18 @@
     --fg-success: #35df8d;
     --bg-error: #f5395e3d;
     --fg-error: #ff7386;
+    --bg-info: #007cbe;
+    --fg-info: #007cbe;
   }
 
   @layer base {
     body {
       background-color: var(--background);
       color: var(--color);
+    }
+
+    input {
+      color: #000;
     }
 
     #content {
@@ -30,12 +36,17 @@
       transform: scale(.8);
     }
 
+    #banner-new {
+      transform: scale(.7);
+    }
+
     @media (min-width: 768px) {
       #content {
         min-height: 90svh;
       }
 
-      #banner {
+      #banner,
+      #banner-new {
         transform: scale(1.0);
       }
     }
@@ -48,7 +59,86 @@
       @apply my-3;
     }
 
+    footer {
+      color: var(--muted);
+    }
+
+
+    button[hx-get],
+    button[hx-post],
+    button[type="submit"],
+    .button {
+      transition: background-color 150ms ease-in, color 150ms ease-in;
+    }
+
+    button[hx-get]:hover,
+    button[hx-post]:hover,
+    button[type="submit"]:hover,
+    .button:hover {
+      background-color: var(--color);
+      color: var(--background);
+    }
+
+    button[hx-get] {
+      text-decoration: underline;
+    }
+
+    button[hx-post],
+    button[type="submit"],
+    .button {
+      border-width: 1px;
+    }
+
+    nav a,
+    button[hx-get],
+    button[hx-post],
+    button[type="submit"] {
+      padding: 0 0.25em;
+    }
+
+    button:disabled {
+      color: var(--muted);
+      border-color: var(--muted);
+    }
+
     a:hover {
       @apply underline;
+    }
+
+    .htmx-request {
+      color: var(--muted);
+    }
+
+    .neon {
+      border: none;
+      padding: 0.5em 3em;
+      transition: background-color 150ms ease-in, color 150ms ease-in;
+    }
+
+    .neon.success {
+      background-color: var(--bg-success);
+      color: var(--fg-success);
+    }
+
+    .neon.success:hover,
+    .neon.success.active {
+      background-color: var(--fg-success);
+      color: var(--white);
+    }
+
+    .neon.error {
+      background-color: var(--bg-error);
+      color: var(--fg-error);
+    }
+
+    .neon.error:hover,
+    .neon.error.active {
+      background-color: var(--fg-error);
+      color: var(--white);
+    }
+
+    .neon.info {
+      background-color: var(--bg-info);
+      color: var(--white);
     }
 }
