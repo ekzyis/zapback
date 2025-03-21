@@ -15,7 +15,7 @@ var (
 	PublicUrl                  string
 	CommitShortSha             string
 	CommitLongSha              string
-	PhoenixdURL                string
+	PhoenixdUrl                string
 	PhoenixdLimitedAccessToken string
 )
 
@@ -25,7 +25,7 @@ func Load(filenames ...string) error {
 	}
 	flag.IntVar(&Port, "PORT", 4444, "Server port")
 	flag.StringVar(&PublicUrl, "PUBLIC_URL", "", "Base URL")
-	flag.StringVar(&PhoenixdURL, "PHOENIXD_URL", "", "Phoenixd URL")
+	flag.StringVar(&PhoenixdUrl, "PHOENIXD_URL", "", "Phoenixd URL")
 	flag.StringVar(&PhoenixdLimitedAccessToken, "PHOENIXD_LIMITED_ACCESS_TOKEN", "", "Phoenixd limited access token")
 	flag.StringVar(&Env, "ENV", "development", "Build environment")
 	return nil

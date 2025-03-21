@@ -29,7 +29,7 @@ func NewPhoenixd(opts ...func(*Phoenixd) *Phoenixd) *Phoenixd {
 	return ln
 }
 
-func WithPhoenixdURL(u string) func(*Phoenixd) *Phoenixd {
+func WithPhoenixdUrl(u string) func(*Phoenixd) *Phoenixd {
 	return func(p *Phoenixd) *Phoenixd {
 		u, err := url.Parse(u)
 		if err != nil {

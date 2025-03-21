@@ -17,10 +17,10 @@ func main() {
 
 	log.Printf("url:      %s", env.PublicUrl)
 	log.Printf("commit:   %s", env.CommitShortSha)
-	log.Printf("phoenixd: %s", env.PhoenixdURL)
+	log.Printf("phoenixd: %s", env.PhoenixdUrl)
 
 	p := lightning.NewPhoenixd(
-		lightning.WithPhoenixdURL(env.PhoenixdURL),
+		lightning.WithPhoenixdUrl(env.PhoenixdUrl),
 		lightning.WithPhoenixdLimitedAccessToken(env.PhoenixdLimitedAccessToken),
 	)
 
