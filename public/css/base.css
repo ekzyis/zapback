@@ -101,6 +101,16 @@
     cursor: pointer;
   }
 
+  form #cancel {
+    cursor: pointer;
+    color: var(--muted);
+  }
+
+  form #cancel:hover {
+    color: var(--color);
+    text-decoration: none;
+  }
+
   .htmx-request {
     color: var(--muted);
   }
