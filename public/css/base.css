@@ -3,142 +3,137 @@
 @tailwind utilities;
 
 :root {
-    --background: #191d21;
-    --color: #d3d3d3;
-    --muted: #6c757d;
-    --lightning: #fada5e;
-    --nostr: #8d45dd;
-    --black: #000;
-    --white: #fff;
-    --bg-success: #149e613d;
-    --fg-success: #35df8d;
-    --bg-error: #f5395e3d;
-    --fg-error: #ff7386;
-    --bg-info: #007cbe;
-    --fg-info: #007cbe;
+  --background: #191d21;
+  --color: #d3d3d3;
+  --muted: #6c757d;
+  --lightning: #fada5e;
+  --nostr: #8d45dd;
+  --black: #000;
+  --white: #fff;
+  --bg-success: #149e613d;
+  --fg-success: #35df8d;
+  --bg-error: #f5395e3d;
+  --fg-error: #ff7386;
+  --bg-info: #007cbe;
+  --fg-info: #007cbe;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--color);
   }
 
-  @layer base {
-    body {
-      background-color: var(--background);
-      color: var(--color);
-    }
+  input {
+    color: #000;
+  }
 
-    input {
-      color: #000;
-    }
+  #content {
+    min-height: 85svh;
+  }
 
+  #banner {
+    transform: scale(.8);
+  }
+
+  #banner-new {
+    transform: scale(.7);
+  }
+
+  @media (min-width: 768px) {
     #content {
-      min-height: 85svh;
+      min-height: 90svh;
     }
 
-    #banner {
-      transform: scale(.8);
-    }
-
+    #banner,
     #banner-new {
-      transform: scale(.7);
+      transform: scale(1.0);
     }
+  }
 
-    @media (min-width: 768px) {
-      #content {
-        min-height: 90svh;
-      }
+  .figlet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 144px;
+    @apply my-3;
+  }
 
-      #banner,
-      #banner-new {
-        transform: scale(1.0);
-      }
-    }
+  button[hx-get],
+  button[hx-post],
+  button[type="submit"],
+  .button {
+    transition: background-color 150ms ease-in, color 150ms ease-in;
+  }
 
-    .figlet {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 144px;
-      @apply my-3;
-    }
+  button[hx-get]:hover,
+  button[hx-post]:hover,
+  button[type="submit"]:hover,
+  .button:hover {
+    background-color: var(--color);
+    color: var(--background);
+  }
 
-    footer {
-      color: var(--muted);
-    }
+  button[hx-get] {
+    text-decoration: underline;
+  }
 
+  button[hx-post],
+  button[type="submit"],
+  .button {
+    border-width: 1px;
+  }
 
-    button[hx-get],
-    button[hx-post],
-    button[type="submit"],
-    .button {
-      transition: background-color 150ms ease-in, color 150ms ease-in;
-    }
+  nav a,
+  button[hx-get],
+  button[hx-post],
+  button[type="submit"] {
+    padding: 0 0.25em;
+  }
 
-    button[hx-get]:hover,
-    button[hx-post]:hover,
-    button[type="submit"]:hover,
-    .button:hover {
-      background-color: var(--color);
-      color: var(--background);
-    }
+  button:disabled {
+    color: var(--muted);
+    border-color: var(--muted);
+  }
 
-    button[hx-get] {
-      text-decoration: underline;
-    }
+  a:hover {
+    @apply underline;
+  }
 
-    button[hx-post],
-    button[type="submit"],
-    .button {
-      border-width: 1px;
-    }
+  .htmx-request {
+    color: var(--muted);
+  }
 
-    nav a,
-    button[hx-get],
-    button[hx-post],
-    button[type="submit"] {
-      padding: 0 0.25em;
-    }
+  .neon {
+    border: none;
+    padding: 0.5em 3em;
+    transition: background-color 150ms ease-in, color 150ms ease-in;
+  }
 
-    button:disabled {
-      color: var(--muted);
-      border-color: var(--muted);
-    }
+  .neon.success {
+    background-color: var(--bg-success);
+    color: var(--fg-success);
+  }
 
-    a:hover {
-      @apply underline;
-    }
+  .neon.success:hover,
+  .neon.success.active {
+    background-color: var(--fg-success);
+    color: var(--white);
+  }
 
-    .htmx-request {
-      color: var(--muted);
-    }
+  .neon.error {
+    background-color: var(--bg-error);
+    color: var(--fg-error);
+  }
 
-    .neon {
-      border: none;
-      padding: 0.5em 3em;
-      transition: background-color 150ms ease-in, color 150ms ease-in;
-    }
+  .neon.error:hover,
+  .neon.error.active {
+    background-color: var(--fg-error);
+    color: var(--white);
+  }
 
-    .neon.success {
-      background-color: var(--bg-success);
-      color: var(--fg-success);
-    }
-
-    .neon.success:hover,
-    .neon.success.active {
-      background-color: var(--fg-success);
-      color: var(--white);
-    }
-
-    .neon.error {
-      background-color: var(--bg-error);
-      color: var(--fg-error);
-    }
-
-    .neon.error:hover,
-    .neon.error.active {
-      background-color: var(--fg-error);
-      color: var(--white);
-    }
-
-    .neon.info {
-      background-color: var(--bg-info);
-      color: var(--white);
-    }
+  .neon.info {
+    background-color: var(--bg-info);
+    color: var(--white);
+  }
 }
