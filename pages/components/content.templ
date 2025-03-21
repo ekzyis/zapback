@@ -6,6 +6,7 @@ templ Content() {
         class="flex flex-col justify-center items-center"
         hx-target="#content"
         hx-select="#content"
+        hx-swap="outerHTML"
         hx-push-url="true"
     >
         { children... }
