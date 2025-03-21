@@ -1,0 +1,13 @@
+package components
+
+templ Content() {
+    <div
+        id="content"
+        class="flex flex-col justify-center items-center"
+        hx-target="#content"
+        hx-select="#content"
+        hx-push-url="true"
+    >
+        { children... }
+    </div>
+}

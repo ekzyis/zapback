@@ -5,19 +5,14 @@ import "github.com/ekzyis/zapback/pages/components"
 templ Index() {
     <html>
         @components.Head()
-        <body class="container">
-			<div
-                id="content"
-                class="flex flex-col justify-center items-center"
-                hx-target="#content"
-                hx-select="#content"
-            >
+        @components.Body() {
+			@components.Content() {
                 <div id="banner">
                     @components.Figlet("slant", "zapback")
                 </div>
                 <a class="text-xl md:text-2xl my-3" hx-get="/new">new game</a>
                 <a class="text-xl md:text-2xl my-3" hx-get="/load">load game</a>
-            </div>
-        </body>
+            }
+        }
     </html>
 }

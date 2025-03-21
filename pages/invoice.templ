@@ -8,10 +8,10 @@ import (
 templ Invoice(invoice *lightning.Invoice) {
     <html>
         @components.Head()
-        <body class="container">
-			<div id="content" class="flex flex-col justify-center items-center">
+        @components.Body() {
+			@components.Content() {
                 @components.Invoice(invoice)
-            </div>
-        </body>
+            }
+        }
     </html>
 }

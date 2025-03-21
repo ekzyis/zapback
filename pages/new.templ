@@ -5,8 +5,8 @@ import "github.com/ekzyis/zapback/pages/components"
 templ NewGame() {
     <html>
         @components.Head()
-        <body class="container">
-			<div id="content" class="flex flex-col justify-center items-center">
+        @components.Body() {
+			@components.Content() {
                 <div id="banner-new">
                     @components.Figlet("slant", "new game")
                 </div>
@@ -23,7 +23,7 @@ templ NewGame() {
                         <button type="submit">submit</button>
                     </div>
                 </form>
-            </div>
-        </body>
+            }
+        }
     </html>
 }

@@ -9,11 +9,11 @@ import (
 templ Error(code int) {
 	<html>
 		@components.Head()
-		<body class="container">
-			<div id="content" class="flex flex-col justify-center items-center">
+		@components.Body() {
+			@components.Content() {
 				@components.Figlet("random", strconv.Itoa(code))
 				<div class="font-mono mb-3">{ http.StatusText(code) }</div>
-			</div>
-		</body>
+			}
+		}
 	</html>
 }
