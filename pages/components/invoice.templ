@@ -55,7 +55,6 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
                 }
 
                 function _countdown() {
-                    console.log(expiresIn)
                     var hours = Math.floor(expiresIn / 3600)
                     var minutes = Math.floor((expiresIn % 3600) / 60)
                     var seconds = expiresIn % 60
