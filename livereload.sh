@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PID=$(pidof zapback)
-DIRS="db/ env/ lib/ lightning/ pages/ public/ server/"
+DIRS="db/ env/ lib/ lightning/ pages/ public/ server/ main.go"
 
 set -e
 

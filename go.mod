@@ -4,6 +4,7 @@ go 1.23.3
 
 require (
 	github.com/a-h/templ v0.3.833
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lukesampson/figlet v0.0.0-20190211215653-8a3ef4a6ac42

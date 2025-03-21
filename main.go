@@ -17,11 +17,14 @@ func main() {
 
 	log.Printf("url:      %s", env.PublicUrl)
 	log.Printf("commit:   %s", env.CommitShortSha)
-	log.Printf("phoenixd: %s", env.PhoenixdUrl)
+	log.Printf("voltage:  %s", env.VoltageUrl)
 
-	p := lightning.NewPhoenixd(
-		lightning.WithPhoenixdUrl(env.PhoenixdUrl),
-		lightning.WithPhoenixdLimitedAccessToken(env.PhoenixdLimitedAccessToken),
+	v := lightning.NewVoltage(
+		lightning.WithVoltageUrl(env.VoltageUrl),
+		lightning.WithVoltageOrganizationId(env.VoltageOrganizationId),
+		lightning.WithVoltageEnvId(env.VoltageEnvId),
+		lightning.WithVoltageWalletId(env.VoltageWalletId),
+		lightning.WithVoltageApiKey(env.VoltageApiKey),
 	)
 
 	s := server.New(server.Context{
@@ -29,7 +32,7 @@ func main() {
 		PublicURL:      env.PublicUrl,
 		CommitShortSha: env.CommitShortSha,
 		CommitLongSha:  env.CommitLongSha,
-		Ln:             p,
+		Ln:             v,
 	})
 
 	if err := s.Start(fmt.Sprintf(":%d", env.Port)); err != nil {
