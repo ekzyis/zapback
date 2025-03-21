@@ -7,6 +7,7 @@ import (
 
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/pages"
+	"github.com/ekzyis/zapback/pages/components"
 	"github.com/labstack/echo/v4"
 )
 
@@ -51,5 +52,16 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		)
 
 		return pages.Render(pages.Invoice(decoded), http.StatusOK, eCtx)
+	}
+}
+
+func getInvoice(sCtx Context) echo.HandlerFunc {
+	return func(eCtx echo.Context) error {
+		invoice, err := sCtx.Ln.GetInvoice(eCtx.Param("paymentHash"))
+		if err != nil {
+			return err
+		}
+
+		return pages.Render(components.InvoiceStatus(invoice), http.StatusOK, eCtx)
 	}
 }

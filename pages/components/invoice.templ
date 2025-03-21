@@ -71,7 +71,6 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
                 _countdown()
                 var interval = setInterval(_countdown, 1000)
             </script>
-            <!--
             <div
                 id="poll"
                 hx-get={ string(templ.SafeURL("/invoice/" + invoice.PaymentHash)) }
@@ -80,7 +79,6 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
                 hx-swap="outerHTML"
                 hx-select="#status"
             ></div>
-            -->
 		}
 	</div>
 }

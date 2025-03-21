@@ -53,6 +53,32 @@ type VoltageCreateInvoiceResponse struct {
 	WalletId       string `json:"wallet_id"`
 }
 
+/*
+	{
+      "created_at": "2024-11-21T18:47:04.008Z",
+      "currency": "btc",
+      "data": {
+        "amount_msats": 150000,
+        "max_fee_msats": 1000,
+        "memo": "testing",
+        "payment_request": "lntbs1500n1pn5w25ypp59sfhx5llskdp6rmsmmq3zs86xey6l4y9wkzvkjl5v2cw0ex7xd4sdqqcqzzsxqyz5vqsp5u333jtc7lh0qvkusq5ntcpm3n2jjx6tw8jz7zvpqpnt3v8e572eq9qxpqysgq4hm7n79tnk76j4ll4f7ey9mmxdyj5pwzcmyqgxtgz40vjg9w58wq73040qvuurj83jakt2zws6y9qgzg2f6gtnj3ajf0mj4gw4mdt2cqhr2tpz"
+      },
+      "direction": "send",
+      "environment_id": "123e4567-e89b-12d3-a456-426614174000",
+      "error": null,
+      "id": "3e84b6c5-5bbe-4e0f-9fb3-f1198330f6fa",
+      "organization_id": "b0684ab8-1130-46af-8f70-71519442f108",
+      "status": "sending",
+      "type": "bolt11",
+      "updated_at": "2024-11-21T18:47:04.008Z",
+      "wallet_id": "7a68a525-9d11-4c1e-a3dd-1c2bf1378ba2"
+    }
+*/
+
+type VoltagePaymentHistoryResponse struct {
+	Items []VoltageCreateInvoiceResponse `json:"items"`
+}
+
 func NewVoltage(opts ...func(*Voltage) *Voltage) *Voltage {
 	v := &Voltage{}
 	for _, opt := range opts {
@@ -158,8 +184,24 @@ func (v *Voltage) CreateInvoice(msats int64, description string) (PaymentRequest
 }
 
 func (v *Voltage) GetInvoice(paymentHash string) (*Invoice, error) {
-	// TODO: implement
-	return nil, nil
+	// XXX Voltage only allows us to lookup a payment via the internal id, not the payment hash.
+	// So we fetch all payments and then find the one with the matching payment hash ourselves.
+	history, err := v.getHistory()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range history.Items {
+		decoded, err := DecodePaymentRequest(PaymentRequest(item.Data.PaymentRequest))
+		if err != nil {
+			return nil, err
+		}
+		if decoded.PaymentHash == paymentHash {
+			return decoded, nil
+		}
+	}
+
+	return nil, echo.NewHTTPError(http.StatusNotFound)
 }
 
 func (v *Voltage) getInvoice(paymentId string) (*VoltageCreateInvoiceResponse, error) {
@@ -195,4 +237,39 @@ func (v *Voltage) getInvoice(paymentId string) (*VoltageCreateInvoiceResponse, e
 	}
 
 	return invoiceResp, nil
+}
+
+func (v *Voltage) getHistory() (*VoltagePaymentHistoryResponse, error) {
+	endpoint := v.url.JoinPath(
+		"organizations", v.organizationId,
+		"environments", v.envId,
+		"payments")
+
+	req, err := http.NewRequest("GET", endpoint.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-Api-Key", v.apiKey)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, echo.NewHTTPError(resp.StatusCode)
+	}
+
+	var history *VoltagePaymentHistoryResponse
+	if err := json.Unmarshal(body, &history); err != nil {
+		return nil, err
+	}
+
+	return history, nil
 }
