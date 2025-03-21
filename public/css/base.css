@@ -111,8 +111,30 @@
     text-decoration: none;
   }
 
-  .htmx-request {
-    color: var(--muted);
+  .htmx-indicator {
+    opacity: 0;
+    height: .5vh;
+    left: 0;
+    width: 100%;
+    background-color: var(--color);
+    transition: opacity .2s ease-out, width .2s ease-out;
+  }
+
+  .htmx-indicator.htmx-request {
+    opacity: 1;
+    /* if I'd be smart, I would use the Content-Length header in some way to determine the duration */
+    animation: progressbar .3s ease-in-out;
+  }
+
+  @keyframes progressbar {
+    from {
+      left: 0;
+      width: 0;
+    }
+    to {
+      left: 0;
+      width: 100%;
+    }
   }
 
   .neon {
