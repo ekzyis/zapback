@@ -1,0 +1,36 @@
+package components
+
+templ Modal(show bool) {
+	<div
+        id="modal"
+        class={
+            "flex justify-center items-center",
+            "fixed inset-0",
+            "backdrop-blur-sm bg-black/30",
+
+            // TODO: set z-index based on show
+            // templ.KV("z-index", zIndex(show)),
+
+            // this doesn't work because templ.GetChildren(ctx) returns NopComponent ...
+            // see https://github.com/a-h/templ/issues/975
+            // templ.KV("hidden", templ.GetChildren(ctx) == nil),
+            templ.KV("hidden", !show) }>
+        <div class="border border-muted rounded">
+            <div class="relative">
+                <button id="close" class="absolute top-2 right-2 w-fit text-muted hover:text-reset">X</button>
+                { children... }
+            </div>
+        </div>
+        <script type="text/javascript" id="modal-js">
+            htmx.on("#close", "click", function () {
+                // XXX do I (still) need this ???
+                // abort in-flight polls and prevent new polls
+                // htmx.trigger("#poll", "htmx:abort")
+                // htmx.on("#poll", "htmx:beforeRequest", function (e) { e.preventDefault() })
+                const modal = htmx.find("#modal")
+                modal.replaceChildren([])
+                modal.classList.add("hidden")
+            })
+        </script>
+	</div>
+}

@@ -115,12 +115,13 @@ func (p *Phoenixd) GetInvoice(paymentHash string) (*Invoice, error) {
 	}
 
 	var response struct {
-		PaymentHash string `json:"paymentHash"`
-		Preimage    string `json:"preimage"`
-		Sats        int64  `json:"receivedSat"`
-		Description string `json:"description"`
-		CreatedAt   int64  `json:"createdAt"`
-		ConfirmedAt int64  `json:"completedAt"`
+		PaymentRequest string `json:"invoice"`
+		PaymentHash    string `json:"paymentHash"`
+		Preimage       string `json:"preimage"`
+		Sats           int64  `json:"receivedSat"`
+		Description    string `json:"description"`
+		CreatedAt      int64  `json:"createdAt"`
+		ConfirmedAt    int64  `json:"completedAt"`
 	}
 	if err := json.Unmarshal(body, &response); err != nil {
 		return nil, err
@@ -132,6 +133,11 @@ func (p *Phoenixd) GetInvoice(paymentHash string) (*Invoice, error) {
 		confirmedAt = time.Unix(response.ConfirmedAt/1000, 0)
 	}
 
+	decoded, err := DecodePaymentRequest(PaymentRequest(response.PaymentRequest))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Invoice{
 		PaymentHash: response.PaymentHash,
 		Preimage:    response.Preimage,
@@ -139,5 +145,7 @@ func (p *Phoenixd) GetInvoice(paymentHash string) (*Invoice, error) {
 		Description: response.Description,
 		CreatedAt:   createdAt,
 		ConfirmedAt: confirmedAt,
+		ExpiresAt:   decoded.ExpiresAt,
+		ExpiresIn:   decoded.ExpiresIn,
 	}, nil
 }

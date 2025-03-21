@@ -43,6 +43,8 @@ func New(sCtx Context) *Server {
 	s.GET("/new", newGame(sCtx))
 	s.POST("/new", createGame(sCtx))
 
+	s.GET("/invoice/:payment_hash", invoiceStatus(sCtx))
+
 	return s
 }
 

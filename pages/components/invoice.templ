@@ -8,21 +8,14 @@ import (
 
 templ Invoice(invoice *lightning.Invoice) {
 	<div class="p-5 bg-background text-center font-mono">
-		<!--<div id="close" class="flex justify-end"><button class="w-fit text-muted hitbox hover:text-reset">X</button></div>-->
-		<div>Payment Required</div>
+		<div class="mb-3 font-bold">Payment Required</div>
+		<div>{ invoice.Description }</div>
 		<div class="my-1">
 			@Qr(invoice.PaymentRequest, "lightning:"+invoice.PaymentRequest)
 		</div>
 		<div class="my-1">{ format(invoice.Msats) }</div>
 		@InvoiceStatus(invoice)
 		<div class="none" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
-		<script type="text/javascript" id="bolt11-js">
-            htmx.on("#close", "click", function () {
-                // abort in-flight polls and prevent new polls
-                htmx.trigger("#poll", "htmx:abort")
-                htmx.on("#poll", "htmx:beforeRequest", function (e) { e.preventDefault() })
-            })
-        </script>
 	</div>
 }
 
@@ -71,7 +64,6 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
                 _countdown()
                 var interval = setInterval(_countdown, 1000)
             </script>
-            <!--
             <div
                 id="poll"
                 hx-get={ string(templ.SafeURL("/invoice/" + invoice.PaymentHash)) }
@@ -80,7 +72,6 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
                 hx-swap="outerHTML"
                 hx-select="#status"
             ></div>
-            -->
 		}
 	</div>
 }

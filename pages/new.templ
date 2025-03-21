@@ -10,7 +10,10 @@ templ NewGame() {
                 <div id="banner-new">
                     @components.Figlet("slant", "new game")
                 </div>
-                <form hx-post="/new">
+                <form
+                    hx-post="/new"
+                    hx-target="#modal"
+                    hx-select="#modal">
                     <div class="grid grid-cols-[auto_auto] gap-4 items-center">
                         <label for="zap_amount">zap amount</label>
                         <div class="relative">
@@ -27,6 +30,8 @@ templ NewGame() {
                             id="cancel"
                             class="mx-3"
                             hx-get="/"
+                            hx-target="#content"
+                            hx-select="#content"
                         >cancel</a>
                         <button type="submit">submit</button>
                     </div>
