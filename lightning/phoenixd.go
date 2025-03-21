@@ -18,6 +18,9 @@ type Phoenixd struct {
 	limitedAccessToken string
 }
 
+// assert that Phoenixd implements Lightning interface
+var _ Lightning = (*Phoenixd)(nil)
+
 func NewPhoenixd(opts ...func(*Phoenixd) *Phoenixd) *Phoenixd {
 	ln := &Phoenixd{}
 	for _, opt := range opts {
