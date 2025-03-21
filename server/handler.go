@@ -5,6 +5,7 @@ import (
 
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/pages"
+	"github.com/ekzyis/zapback/pages/components"
 	"github.com/labstack/echo/v4"
 )
 
@@ -39,6 +40,6 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			return err
 		}
 
-		return pages.Render(pages.Invoice(decoded), http.StatusOK, eCtx)
+		return pages.RenderModal(components.Invoice(decoded), http.StatusOK, eCtx)
 	}
 }
