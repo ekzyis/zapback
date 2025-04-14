@@ -13,11 +13,14 @@ templ NewGame() {
                 <form hx-post="/new">
                     <div class="grid grid-cols-[auto_auto] gap-4 items-center">
                         <label for="pool_amount">pool amount</label>
-                        <input
-                            id="pool_amount"
-                            name="pool_amount"
-                            type="number"
-                            class="my-3 p-2 border rounded" />
+                        <div class="relative">
+                            <input
+                                id="pool_amount"
+                                name="pool_amount"
+                                type="number"
+                                class="my-3 p-2 pr-12 border rounded" />
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted">sats</span>
+                        </div>
                     </div>
                     <div class="flex justify-end">
                         <a
