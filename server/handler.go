@@ -25,13 +25,13 @@ func newGame(sCtx Context) echo.HandlerFunc {
 func createGame(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
 		var form struct {
-			PoolAmount int `form:"pool_amount"`
+			ZapAmount int `form:"zap_amount"`
 		}
 		if err := eCtx.Bind(&form); err != nil {
 			return err
 		}
 
-		pr, err := sCtx.Ln.CreateInvoice(int64(form.PoolAmount*1000), "zapback: funding pool")
+		pr, err := sCtx.Ln.CreateInvoice(int64(form.ZapAmount*1000), "zapback: new game")
 		if err != nil {
 			return err
 		}
