@@ -1,9 +1,7 @@
 package server
 
 import (
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/pages"
@@ -40,15 +38,6 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-
-		log.Println(
-			"created_at", decoded.CreatedAt,
-			"confirmed_at", decoded.ConfirmedAt,
-			"expires_at", decoded.ExpiresAt,
-			"now", time.Now(),
-			"confirmed", !decoded.ConfirmedAt.IsZero(),
-			"expired", decoded.ExpiresAt.Before(time.Now()),
-		)
 
 		return pages.Render(pages.Invoice(decoded), http.StatusOK, eCtx)
 	}
