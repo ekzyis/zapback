@@ -15,15 +15,15 @@ templ Qr(value string, href string) {
 		</a>
 		<small class="flex my-1 mx-auto" hx-preserve>
 			<span class="block w-[188px] overflow-hidden">{ value }</span>
-			<button id="copy" class="ms-1 button w-[64px]" hx-preserve>copy</button>
+			@CopyButton(value)
 		</small>
-		@CopyButton(value)
 	} else {
 		<img src={ "data:image/jpeg;base64," + qrEncode(value) }/>
 	}
 }
 
 templ CopyButton(value string) {
+	<button type="button" id="copy" class="ms-1 button w-[64px]" hx-preserve>copy</button>
 	<div class="none" id="copy-data" copy-data={ templ.JSONString(value) } hx-preserve></div>
 	<script type="text/javascript" id="copy-js" hx-preserve>
 		var value = JSON.parse($("#copy-data").getAttribute("copy-data"))
