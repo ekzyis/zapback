@@ -6,8 +6,10 @@ import (
 
 	"github.com/ekzyis/zapback/env"
 	"github.com/ekzyis/zapback/lightning"
+	"github.com/ekzyis/zapback/lightning/lnurl"
 	"github.com/ekzyis/zapback/pages"
 	"github.com/ekzyis/zapback/pages/components"
+	"github.com/ekzyis/zapback/pages/types"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,14 +21,15 @@ func index(sCtx Context) echo.HandlerFunc {
 
 func newGame(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
-		return pages.Render(pages.NewGame(), http.StatusOK, eCtx)
+		return pages.Render(pages.NewGame(nil), http.StatusOK, eCtx)
 	}
 }
 
 func createGame(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
 		var form struct {
-			ZapAmount int `form:"zap_amount"`
+			ZapAmount        int    `form:"zap_amount"`
+			LightningAddress string `form:"lnaddr"`
 		}
 		if err := eCtx.Bind(&form); err != nil {
 			return err
@@ -40,6 +43,18 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		decoded, err := lightning.DecodePaymentRequest(pr)
 		if err != nil {
 			return err
+		}
+
+		if err = lnurl.VerifyLNURLp(form.LightningAddress); err != nil {
+			eCtx.Response().Header().Add("HX-Retarget", "#content")
+			eCtx.Response().Header().Add("HX-Reselect", "#content")
+			eCtx.Logger().Error(err)
+			return pages.Render(
+				// XXX expose detailed error message?
+				pages.NewGame(types.FormError{"lnaddr": "invalid lightning address"}),
+				http.StatusBadRequest,
+				eCtx,
+			)
 		}
 
 		return pages.RenderModal(components.Invoice(decoded), http.StatusOK, eCtx)

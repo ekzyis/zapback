@@ -1,8 +1,11 @@
 package pages
 
-import "github.com/ekzyis/zapback/pages/components"
+import (
+    "github.com/ekzyis/zapback/pages/components"
+    "github.com/ekzyis/zapback/pages/types"
+)
 
-templ NewGame() {
+templ NewGame(err types.FormError) {
     <html>
         @components.Head()
         @components.Body() {
@@ -18,17 +21,34 @@ templ NewGame() {
                 <form
                     hx-post="/new"
                     hx-target="#modal"
-                    hx-select="#modal">
-                    <div class="grid grid-cols-[auto_auto] gap-4 items-center">
+                    hx-select="#modal"
+                    hx-push-url="false">
+                    <div class="grid grid-cols-[auto_auto] gap-x-4 items-center my-3">
                         <label for="zap_amount">zap amount</label>
                         <div class="relative">
                             <input
                                 id="zap_amount"
                                 name="zap_amount"
                                 type="number"
-                                class="my-3 p-2 pr-12 border rounded" />
+                                class="my-1 p-2 pr-12 border rounded"
+                                hx-preserve />
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted">sats</span>
                         </div>
+                        if hasError(err, "zap_amount") {
+                            <div class="error col-start-2">{ err["zap_amount"] }</div>
+                        }
+                        <label for="lnaddr">lightning address</label>
+                        <!-- TODO: outline input on error while preserving value -->
+                        <input
+                            id="lnaddr"
+                            name="lnaddr"
+                            type="text"
+                            class="my-1 p-2 border rounded w-full"
+                            placeholder="how you get paid if you win"
+                            hx-preserve />
+                        if hasError(err, "lnaddr") {
+                            <div class="error col-start-2">{ err["lnaddr"] }</div>
+                        }
                     </div>
                     <div class="flex justify-end">
                         <a
@@ -44,4 +64,8 @@ templ NewGame() {
             }
         }
     </html>
+}
+
+func hasError(err types.FormError, field string) bool {
+    return err != nil && err[field] != ""
 }

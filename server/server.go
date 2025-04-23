@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -60,11 +59,6 @@ func httpErrorHandler(sCtx Context) echo.HTTPErrorHandler {
 
 		if httpError, ok := err.(*echo.HTTPError); ok {
 			code = httpError.Code
-		}
-
-		if strings.Contains(err.Error(), "violates check constraint") ||
-			strings.Contains(err.Error(), "violates unique constraint") {
-			code = 400
 		}
 
 		// make sure that HTMX selects and targets correct element

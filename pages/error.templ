@@ -6,6 +6,8 @@ import (
 	"github.com/ekzyis/zapback/pages/components"
 )
 
+type FormError map[string]string
+
 templ Error(code int) {
 	<html>
 		@components.Head()
