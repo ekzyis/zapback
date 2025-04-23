@@ -17,6 +17,7 @@ var (
 	CommitLongSha              string
 	PhoenixdUrl                string
 	PhoenixdLimitedAccessToken string
+	Debug                      bool
 )
 
 func Load(filenames ...string) error {
@@ -33,6 +34,7 @@ func Load(filenames ...string) error {
 
 func Parse() {
 	flag.Parse()
+	Debug = Env == "development"
 	CommitLongSha = execCmd("git", "rev-parse", "HEAD")
 	CommitShortSha = execCmd("git", "rev-parse", "--short", "HEAD")
 }

@@ -2,7 +2,9 @@ package server
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/ekzyis/zapback/env"
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/pages"
 	"github.com/ekzyis/zapback/pages/components"
@@ -49,6 +51,11 @@ func invoiceStatus(sCtx Context) echo.HandlerFunc {
 		inv, err := sCtx.Ln.GetInvoice(eCtx.Param("payment_hash"))
 		if err != nil {
 			return err
+		}
+
+		// mark invoices as paid after 5 seconds in debug mode
+		if env.Debug && time.Since(inv.CreatedAt) >= 5*time.Second {
+			inv.ConfirmedAt = time.Now()
 		}
 
 		return pages.Render(components.InvoiceStatus(inv), http.StatusOK, eCtx)
