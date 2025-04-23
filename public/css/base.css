@@ -63,7 +63,7 @@
   button[hx-post],
   button[type="submit"],
   .button {
-    transition: background-color 150ms ease-in, color 150ms ease-in;
+    @apply rounded;
   }
 
   button[hx-get]:hover,
