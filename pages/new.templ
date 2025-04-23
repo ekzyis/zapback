@@ -10,6 +10,11 @@ templ NewGame() {
                 <div id="banner-new">
                     @components.Figlet("slant", "new game")
                 </div>
+                <div class="mb-3">
+                    To start a new game, you must fund the pool with your first zap.
+                    The size of your first zap determines the size of each zap in the game.
+                    Last zapper within 24 hours wins!
+                </div>
                 <form
                     hx-post="/new"
                     hx-target="#modal"
