@@ -70,10 +70,10 @@
     @apply rounded;
   }
 
-  button[hx-get]:hover,
-  button[hx-post]:hover,
-  button[type="submit"]:hover,
-  .button:hover {
+  button[hx-get]:not(:disabled):hover,
+  button[hx-post]:not(:disabled):hover,
+  button[type="submit"]:not(:disabled):hover,
+  .button:not(:disabled):hover {
     background-color: var(--color);
     color: var(--background);
   }
@@ -139,10 +139,6 @@
       left: 0;
       width: 100%;
     }
-  }
-
-  .error {
-    color: var(--fg-error);
   }
 
   .neon {

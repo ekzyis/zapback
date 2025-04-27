@@ -35,6 +35,32 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			return err
 		}
 
+		formError := types.FormError{}
+
+		if form.ZapAmount < 1 {
+			formError["zap_amount"] = "must be greater than 0"
+		}
+
+		if form.LightningAddress == "" {
+			formError["lnaddr"] = "required"
+		}
+
+		if err := lnurl.VerifyLNURLp(form.LightningAddress); err != nil {
+			// XXX expose detailed error message?
+			formError["lnaddr"] = "invalid lightning address"
+		}
+
+		if len(formError) > 0 {
+			eCtx.Response().Header().Add("HX-Retarget", "#content")
+			eCtx.Response().Header().Add("HX-Reselect", "#content")
+			eCtx.Logger().Error(formError)
+			return pages.Render(
+				pages.NewGame(formError),
+				http.StatusBadRequest,
+				eCtx,
+			)
+		}
+
 		pr, err := sCtx.Ln.CreateInvoice(int64(form.ZapAmount*1000), "zapback: new game")
 		if err != nil {
 			return err
@@ -43,18 +69,6 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		decoded, err := lightning.DecodePaymentRequest(pr)
 		if err != nil {
 			return err
-		}
-
-		if err = lnurl.VerifyLNURLp(form.LightningAddress); err != nil {
-			eCtx.Response().Header().Add("HX-Retarget", "#content")
-			eCtx.Response().Header().Add("HX-Reselect", "#content")
-			eCtx.Logger().Error(err)
-			return pages.Render(
-				// XXX expose detailed error message?
-				pages.NewGame(types.FormError{"lnaddr": "invalid lightning address"}),
-				http.StatusBadRequest,
-				eCtx,
-			)
 		}
 
 		return pages.RenderModal(components.Invoice(decoded), http.StatusOK, eCtx)
