@@ -30,6 +30,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		var form struct {
 			ZapAmount        int    `form:"zap_amount"`
 			LightningAddress string `form:"lnaddr"`
+			Players          int    `form:"players"` // TODO: allow more than two players
 		}
 		if err := eCtx.Bind(&form); err != nil {
 			return err

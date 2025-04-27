@@ -53,6 +53,17 @@ templ NewGame(err types.FormError) {
                         if hasError(err, "lnaddr") {
                             <div class="text-error text-sm text-end col-start-2">{ err["lnaddr"] }</div>
                         }
+                        <label for="players">players</label>
+                        <input
+                            id="players"
+                            name="players"
+                            type="number"
+                            min="2"
+                            max="2"
+                            value="2"
+                            disabled
+                            class="my-1 p-2 rounded" />
+                        <div class="text-muted text-sm text-end col-start-2">more than 2 players coming soon</div>
                     </div>
                     <div class="flex justify-end">
                         <a
