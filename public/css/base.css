@@ -127,7 +127,7 @@
   .htmx-indicator.htmx-request {
     opacity: 1;
     /* if I'd be smart, I would use the Content-Length header in some way to determine the duration */
-    animation: progressbar .3s ease-in-out;
+    animation: progressbar 1s ease-in-out;
   }
 
   @keyframes progressbar {
