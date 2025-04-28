@@ -203,6 +203,28 @@ func startGame(sCtx Context) echo.HandlerFunc {
 	}
 }
 
+func loadGame(sCtx Context) echo.HandlerFunc {
+	return func(eCtx echo.Context) error {
+		code := eCtx.FormValue("code")
+		if code == "" {
+			var err types.FormError
+			// if POST, then we're submitting the form, else we're just loading the page
+			if eCtx.Request().Method == "POST" {
+				err = types.FormError{
+					"code": "required",
+				}
+			}
+			return pages.Render(
+				pages.LoadGame(err),
+				http.StatusOK,
+				eCtx,
+			)
+		}
+
+		return eCtx.Redirect(http.StatusSeeOther, fmt.Sprintf("/game/%s", code))
+	}
+}
+
 func invoiceStatus(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
 		inv, err := sCtx.Db.GetInvoice(eCtx.Param("payment_hash"))

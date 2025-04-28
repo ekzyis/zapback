@@ -42,6 +42,8 @@ func New(sCtx Context) *Server {
 
 	s.GET("/game", newGame(sCtx))
 	s.POST("/game", createGame(sCtx))
+	s.GET("/game/load", loadGame(sCtx))
+	s.POST("/game/load", loadGame(sCtx))
 
 	s.GET("/game/:code", game(sCtx))
 	s.POST("/game/:code/start", startGame(sCtx))

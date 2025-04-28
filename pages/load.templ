@@ -1,0 +1,43 @@
+package pages
+
+import (
+    "github.com/ekzyis/zapback/pages/components"
+	"github.com/ekzyis/zapback/pages/types"
+)
+
+templ LoadGame(err types.FormError) {
+    <html>
+        @components.Head()
+        @components.Body() {
+			@components.Content() {
+                <div id="banner-new">
+                    @components.Figlet("slant", "load game")
+                </div>
+                <form
+                    hx-post="/game/load"
+                    hx-target="#content"
+                    hx-select="#content"
+                    hx-disabled-elt="button[type='submit']"
+                    hx-on::before-request="document.querySelectorAll('.text-error').forEach(el => el.remove())">
+                    <div class="grid grid-cols-[auto_auto] gap-x-4 items-center my-3">
+                        <label for="code">code</label>
+                        <input id="code" name="code" type="text" class="my-1 p-2 rounded" autocomplete="off" />
+                        if err.HasError("code") {
+                            <div class="text-error text-sm text-end col-start-2">{ err["code"] }</div>
+                        }
+                    </div>
+                    <div class="flex justify-end">
+                        <a
+                            id="cancel"
+                            class="mx-3"
+                            hx-get="/"
+                            hx-target="#content"
+                            hx-select="#content"
+                        >cancel</a>
+                        <button type="submit">load</button>
+                    </div>
+                </form>
+            }
+        }
+    </html>
+}
