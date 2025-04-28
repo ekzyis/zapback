@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/ekzyis/zapback/db"
 	"github.com/ekzyis/zapback/env"
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/server"
@@ -18,11 +19,21 @@ func main() {
 	log.Printf("url:      %s", env.PublicUrl)
 	log.Printf("commit:   %s", env.CommitShortSha)
 	log.Printf("phoenixd: %s", env.PhoenixdUrl)
+	log.Printf("postgres: %s", env.PostgresUrlWithoutPassword)
 
 	p := lightning.NewPhoenixd(
 		lightning.WithPhoenixdUrl(env.PhoenixdUrl),
 		lightning.WithPhoenixdLimitedAccessToken(env.PhoenixdLimitedAccessToken),
 	)
+
+	db, err := db.New(env.PostgresUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Migrate(); err != nil {
+		log.Fatal(err)
+	}
 
 	s := server.New(server.Context{
 		Env:            env.Env,
@@ -30,6 +41,7 @@ func main() {
 		CommitShortSha: env.CommitShortSha,
 		CommitLongSha:  env.CommitLongSha,
 		Ln:             p,
+		Db:             db,
 	})
 
 	if err := s.Start(fmt.Sprintf(":%d", env.Port)); err != nil {

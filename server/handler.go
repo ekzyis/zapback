@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ekzyis/zapback/db"
 	"github.com/ekzyis/zapback/env"
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/lightning/lnurl"
@@ -60,13 +61,52 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			)
 		}
 
-		pr, err := sCtx.Ln.CreateInvoice(int64(form.ZapAmount*1000), "zapback: new game")
+		desc := "zapback: new game"
+		msats := int64(form.ZapAmount * 1000)
+
+		pr, err := sCtx.Ln.CreateInvoice(msats, desc)
 		if err != nil {
 			return err
 		}
 
 		decoded, err := lightning.DecodePaymentRequest(pr)
 		if err != nil {
+			return err
+		}
+
+		tx, err := sCtx.Db.BeginTx(eCtx.Request().Context(), nil)
+		if err != nil {
+			return err
+		}
+
+		game, err := tx.CreateGame(&db.CreateGame{ZapAmount: msats})
+		if err != nil {
+			return err
+		}
+
+		player, err := tx.CreatePlayer(&db.CreatePlayer{
+			LightningAddress: form.LightningAddress,
+			GameId:           game.Id,
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.CreateInvoice(&db.CreateInvoice{
+			CreatedAt:      decoded.CreatedAt,
+			ExpiresAt:      decoded.ExpiresAt,
+			PaymentHash:    decoded.PaymentHash,
+			PaymentRequest: string(pr),
+			MsatsRequested: msats,
+			Description:    desc,
+			PlayerId:       player.Id,
+			GameId:         game.Id,
+		})
+		if err != nil {
+			return err
+		}
+
+		if err := tx.Commit(); err != nil {
 			return err
 		}
 

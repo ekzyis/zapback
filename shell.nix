@@ -10,6 +10,7 @@ pkgs.mkShell {
     gnumake
     inotify-tools
     figlet
+    postgresql_17
   ];
   shellHook = ''
     # install templ if not already installed
