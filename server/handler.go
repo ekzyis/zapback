@@ -44,9 +44,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 
 		if form.LightningAddress == "" {
 			formError["lnaddr"] = "required"
-		}
-
-		if err := lnurl.VerifyLNURLp(form.LightningAddress); err != nil {
+		} else if err := lnurl.VerifyLNURLp(form.LightningAddress); err != nil {
 			// XXX expose detailed error message?
 			formError["lnaddr"] = "invalid lightning address"
 		}
