@@ -154,8 +154,8 @@
 
   .neon.success:hover,
   .neon.success.active {
-    background-color: var(--fg-success);
-    color: var(--white);
+    background-color: var(--fg-success) !important;
+    color: var(--white) !important;
   }
 
   .neon.error {

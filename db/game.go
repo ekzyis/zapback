@@ -30,3 +30,19 @@ func (tx *Tx) CreateGame(g *CreateGame) (*Game, error) {
 
 	return &game, nil
 }
+
+func (db *Db) GetGame(code string) (*Game, error) {
+	row := db.QueryRow(`
+		SELECT id, created_at, zap_amount, code
+		FROM game
+		WHERE code = $1`,
+		code,
+	)
+
+	var game Game
+	if err := row.Scan(&game.Id, &game.CreatedAt, &game.ZapAmount, &game.Code); err != nil {
+		return nil, err
+	}
+
+	return &game, nil
+}

@@ -18,6 +18,7 @@ type Invoice struct {
 	Description    sql.NullString
 	PlayerId       int
 	GameId         int
+	GameCode       sql.NullString
 }
 
 type CreateInvoice struct {
@@ -94,20 +95,22 @@ func (tx *Tx) CreateInvoice(inv *CreateInvoice) (*Invoice, error) {
 func (db *Db) GetInvoice(paymentHash string) (*Invoice, error) {
 	row := db.QueryRow(`
 		SELECT
-			id,
-			created_at,
-			expires_at,
-			payment_hash,
-			payment_request,
-			confirmed_at,
-			canceled_at,
-			msats_requested,
-			msats_received,
-			description,
-			player_id,
-			game_id
+			invoice.id,
+			invoice.created_at,
+			invoice.expires_at,
+			invoice.payment_hash,
+			invoice.payment_request,
+			invoice.confirmed_at,
+			invoice.canceled_at,
+			invoice.msats_requested,
+			invoice.msats_received,
+			invoice.description,
+			invoice.player_id,
+			invoice.game_id,
+			game.code
 		FROM invoice
-		WHERE payment_hash = $1
+		LEFT JOIN game ON invoice.game_id = game.id
+		WHERE invoice.payment_hash = $1
 	`, paymentHash)
 
 	var invoice Invoice
@@ -124,6 +127,7 @@ func (db *Db) GetInvoice(paymentHash string) (*Invoice, error) {
 		&invoice.Description,
 		&invoice.PlayerId,
 		&invoice.GameId,
+		&invoice.GameCode,
 	); err != nil {
 		return nil, err
 	}
