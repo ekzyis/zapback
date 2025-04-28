@@ -52,11 +52,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			eCtx.Response().Header().Add("HX-Retarget", "#content")
 			eCtx.Response().Header().Add("HX-Reselect", "#content")
 			eCtx.Logger().Error(formError)
-			return pages.Render(
-				pages.NewGame(formError),
-				http.StatusBadRequest,
-				eCtx,
-			)
+			return pages.Render(pages.NewGame(formError), http.StatusBadRequest, eCtx)
 		}
 
 		desc := "zapback: new game"
