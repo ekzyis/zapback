@@ -39,8 +39,8 @@ func New(sCtx Context) *Server {
 
 	s.GET("/", index(sCtx))
 
-	s.GET("/new", newGame(sCtx))
-	s.POST("/new", createGame(sCtx))
+	s.GET("/game", newGame(sCtx))
+	s.POST("/game", createGame(sCtx))
 
 	s.GET("/invoice/:payment_hash", invoiceStatus(sCtx))
 
