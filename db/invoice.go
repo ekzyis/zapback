@@ -31,6 +31,10 @@ type CreateInvoice struct {
 	GameId         int
 }
 
+type UpdateInvoice struct {
+	ConfirmedAt sql.NullTime
+}
+
 func (tx *Tx) CreateInvoice(inv *CreateInvoice) (*Invoice, error) {
 	row := tx.QueryRow(`
 			INSERT INTO invoice (
@@ -85,4 +89,103 @@ func (tx *Tx) CreateInvoice(inv *CreateInvoice) (*Invoice, error) {
 	}
 
 	return &invoice, nil
+}
+
+func (db *Db) GetInvoice(paymentHash string) (*Invoice, error) {
+	row := db.QueryRow(`
+		SELECT
+			id,
+			created_at,
+			expires_at,
+			payment_hash,
+			payment_request,
+			confirmed_at,
+			canceled_at,
+			msats_requested,
+			msats_received,
+			description,
+			player_id,
+			game_id
+		FROM invoice
+		WHERE payment_hash = $1
+	`, paymentHash)
+
+	var invoice Invoice
+	if err := row.Scan(
+		&invoice.Id,
+		&invoice.CreatedAt,
+		&invoice.ExpiresAt,
+		&invoice.PaymentHash,
+		&invoice.PaymentRequest,
+		&invoice.ConfirmedAt,
+		&invoice.CanceledAt,
+		&invoice.MsatsRequested,
+		&invoice.MsatsReceived,
+		&invoice.Description,
+		&invoice.PlayerId,
+		&invoice.GameId,
+	); err != nil {
+		return nil, err
+	}
+
+	return &invoice, nil
+}
+
+func (db *Db) UpdateInvoice(id int, update *UpdateInvoice) error {
+	_, err := db.Exec(`
+		UPDATE invoice
+		SET confirmed_at = $2
+		WHERE id = $1`,
+		id, update.ConfirmedAt,
+	)
+	return err
+}
+
+func (db *Db) GetPendingInvoices() ([]Invoice, error) {
+	rows, err := db.Query(`
+		SELECT
+			id,
+			created_at,
+			expires_at,
+			payment_hash,
+			payment_request,
+			confirmed_at,
+			canceled_at,
+			msats_requested,
+			msats_received,
+			description,
+			player_id,
+			game_id
+		FROM invoice
+		WHERE confirmed_at IS NULL AND expires_at > NOW()
+		ORDER BY created_at ASC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var invoices []Invoice
+	for rows.Next() {
+		var invoice Invoice
+		if err := rows.Scan(
+			&invoice.Id,
+			&invoice.CreatedAt,
+			&invoice.ExpiresAt,
+			&invoice.PaymentHash,
+			&invoice.PaymentRequest,
+			&invoice.ConfirmedAt,
+			&invoice.CanceledAt,
+			&invoice.MsatsRequested,
+			&invoice.MsatsReceived,
+			&invoice.Description,
+			&invoice.PlayerId,
+			&invoice.GameId,
+		); err != nil {
+			return nil, err
+		}
+		invoices = append(invoices, invoice)
+	}
+
+	return invoices, nil
 }

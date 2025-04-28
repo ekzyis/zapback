@@ -44,6 +44,8 @@ func New(sCtx Context) *Server {
 
 	s.GET("/invoice/:payment_hash", invoiceStatus(sCtx))
 
+	go worker(sCtx)
+
 	return s
 }
 

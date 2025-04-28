@@ -1,27 +1,29 @@
 package components
 
 import (
-    "fmt"
-    "github.com/ekzyis/zapback/lightning"
+	"fmt"
+	"math"
 	"time"
+
+	"github.com/ekzyis/zapback/db"
 )
 
-templ Invoice(invoice *lightning.Invoice) {
+templ Invoice(invoice *db.Invoice) {
 	<div class="p-5 bg-background text-center font-mono">
 		<div class="mb-3 font-bold">Payment Required</div>
-		<div>{ invoice.Description }</div>
+		<div>{ invoice.Description.String }</div>
 		<div class="my-1">
 			@Qr(invoice.PaymentRequest, "lightning:"+invoice.PaymentRequest)
 		</div>
-		<div class="my-1">{ format(invoice.Msats) }</div>
+		<div class="my-1">{ format(invoice.MsatsRequested) }</div>
 		@InvoiceStatus(invoice)
 		<div class="none" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
 	</div>
 }
 
-templ InvoiceStatus(invoice *lightning.Invoice) {
+templ InvoiceStatus(invoice *db.Invoice) {
 	<div id="status">
-		if !invoice.ConfirmedAt.IsZero() {
+		if invoice.ConfirmedAt.Valid {
 			<div class="font-mono neon success my-1">PAID</div>
 			<!-- TODO: show timer for redirect -->
             <!-- TODO: add redirect url -->
@@ -39,7 +41,7 @@ templ InvoiceStatus(invoice *lightning.Invoice) {
 			<div class="font-mono neon error my-1">EXPIRED</div>
 		} else {
             <!-- TODO: add PENDING -->
-			<div class="font-mono my-1" id="countdown" countdown-data={ templ.JSONString(invoice.ExpiresIn) } hx-preserve></div>
+			<div class="font-mono my-1" id="countdown" countdown-data={ templ.JSONString(math.Floor(invoice.ExpiresAt.Sub(time.Now()).Seconds())) } hx-preserve></div>
 			<script type="text/javascript" id="countdown-js" hx-preserve>
                 var expiresIn = JSON.parse($("#countdown").getAttribute("countdown-data"))
 
