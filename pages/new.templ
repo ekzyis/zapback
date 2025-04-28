@@ -37,7 +37,7 @@ templ NewGame(err types.FormError) {
                                 hx-preserve />
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted">sats</span>
                         </div>
-                        if hasError(err, "zap_amount") {
+                        if err.HasError("zap_amount") {
                             <div class="text-error text-sm text-end col-start-2">{ err["zap_amount"] }</div>
                         }
                         <label for="lnaddr">lightning address</label>
@@ -50,7 +50,7 @@ templ NewGame(err types.FormError) {
                             placeholder="how you get paid if you win"
                             autocomplete="off"
                             hx-preserve />
-                        if hasError(err, "lnaddr") {
+                        if err.HasError("lnaddr") {
                             <div class="text-error text-sm text-end col-start-2">{ err["lnaddr"] }</div>
                         }
                         <label for="players">players</label>
@@ -79,8 +79,4 @@ templ NewGame(err types.FormError) {
             }
         }
     </html>
-}
-
-func hasError(err types.FormError, field string) bool {
-    return err != nil && err[field] != ""
 }

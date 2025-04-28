@@ -14,3 +14,7 @@ func (f FormError) Error() string {
 	}
 	return strings.TrimRight(s, ", ")
 }
+
+func (f FormError) HasError(field string) bool {
+	return f != nil && f[field] != ""
+}
