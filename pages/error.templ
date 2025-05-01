@@ -15,6 +15,7 @@ templ Error(code int) {
 			@components.Content() {
 				@components.Figlet("random", strconv.Itoa(code))
 				<div class="font-mono mb-3">{ http.StatusText(code) }</div>
+				<a href="/" class="text-sm font-mono mt-5 italic">← go back home</a>
 			}
 		}
 	</html>
