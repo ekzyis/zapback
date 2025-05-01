@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -13,6 +15,15 @@ type Game struct {
 
 type CreateGame struct {
 	ZapAmount int64
+}
+
+type Turn struct {
+	// player who is taking their turn
+	Player Player
+	// total pool amount of game
+	PoolAmount int64
+	// the invoice that the player must pay to take their turn
+	Invoice *Invoice
 }
 
 func (tx *Tx) CreateGame(g *CreateGame) (*Game, error) {
@@ -45,4 +56,59 @@ func (db *Db) GetGame(code string) (*Game, error) {
 	}
 
 	return &game, nil
+}
+
+func (tx *Tx) HasGameStarted(id int) (bool, error) {
+	row := tx.QueryRow(`
+		SELECT COUNT(*)
+		FROM invoice
+		WHERE game_id = $1
+		AND confirmed_at IS NOT NULL
+	`, id)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count >= 2, nil
+}
+
+func (tx *Tx) GetGameTurn(id int) (*Turn, error) {
+	row := tx.QueryRow(`
+		SELECT player.id, player.lnaddr
+		FROM invoice
+		LEFT JOIN player ON invoice.player_id = player.id
+		WHERE invoice.game_id = $1
+		AND invoice.confirmed_at IS NOT NULL
+		ORDER BY invoice.created_at DESC
+		OFFSET 1
+		LIMIT 1
+	`, id)
+
+	var player Player
+	if err := row.Scan(&player.Id, &player.LightningAddress); err != nil {
+		return nil, err
+	}
+
+	row = tx.QueryRow(`
+		SELECT SUM(invoice.msats_requested)
+		FROM invoice
+		WHERE game_id = $1
+		AND confirmed_at IS NOT NULL
+	`, id)
+
+	var poolAmount int64
+	if err := row.Scan(&poolAmount); err != nil {
+		return nil, err
+	}
+
+	inv, err := tx.GetGameInvoice(id)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, fmt.Errorf("failed to get game invoice: %s", err.Error())
+		}
+	}
+
+	return &Turn{Player: player, PoolAmount: poolAmount, Invoice: inv}, nil
 }

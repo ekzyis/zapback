@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/ekzyis/zapback/db"
 	"github.com/ekzyis/zapback/lightning"
@@ -20,9 +21,9 @@ func index(sCtx Context) echo.HandlerFunc {
 	}
 }
 
-func newGame(sCtx Context) echo.HandlerFunc {
+func gameForm(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
-		return pages.Render(pages.NewGame(nil), http.StatusOK, eCtx)
+		return pages.Render(pages.GameForm(nil), http.StatusOK, eCtx)
 	}
 }
 
@@ -54,7 +55,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			eCtx.Response().Header().Add("HX-Retarget", "#content")
 			eCtx.Response().Header().Add("HX-Reselect", "#content")
 			eCtx.Logger().Error(formError)
-			return pages.Render(pages.NewGame(formError), http.StatusBadRequest, eCtx)
+			return pages.Render(pages.GameForm(formError), http.StatusBadRequest, eCtx)
 		}
 
 		desc := "zapback: new game"
@@ -106,6 +107,17 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			return err
 		}
 
+		// we will use this cookie to render a different page for the inviter vs invitee when they visit /game/:code
+		// we will also unset the cookie on /game/:code
+		eCtx.SetCookie(&http.Cookie{
+			Name:     "inviter",
+			Value:    "true",
+			Path:     fmt.Sprintf("/game/%s", game.Code),
+			Secure:   true,
+			SameSite: http.SameSiteLaxMode,
+			HttpOnly: true,
+		})
+
 		return pages.RenderModal(components.Invoice(inv), http.StatusOK, eCtx)
 	}
 }
@@ -113,13 +125,57 @@ func createGame(sCtx Context) echo.HandlerFunc {
 func game(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
 		code := eCtx.Param("code")
+
 		game, err := sCtx.Db.GetGame(code)
 		if err != nil {
 			return err
 		}
 
-		// TODO: render different page if game started
-		return pages.Render(pages.Game(game, nil), http.StatusOK, eCtx)
+		cookie, _ := eCtx.Cookie("inviter")
+		inviter := false
+		if cookie != nil {
+			inviter = cookie.Value == "true"
+		}
+
+		if inviter {
+			eCtx.SetCookie(&http.Cookie{
+				Name:     "inviter",
+				Value:    "",
+				Path:     fmt.Sprintf("/game/%s", code),
+				MaxAge:   -1,
+				Expires:  time.Unix(0, 0),
+				Secure:   true,
+				SameSite: http.SameSiteLaxMode,
+				HttpOnly: true,
+			})
+			return pages.Render(pages.GameSendInvite(game), http.StatusOK, eCtx)
+		}
+
+		tx, err := sCtx.Db.BeginTx(eCtx.Request().Context(), nil)
+		if err != nil {
+			return err
+		}
+
+		if started, err := tx.HasGameStarted(game.Id); err != nil {
+			return err
+		} else if started {
+			turn, err := tx.GetGameTurn(game.Id)
+			if err != nil {
+				return err
+			}
+
+			if err := tx.Commit(); err != nil {
+				return err
+			}
+
+			return pages.Render(pages.Game(game, turn), http.StatusOK, eCtx)
+		}
+
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+
+		return pages.Render(pages.GameInvite(game, nil), http.StatusOK, eCtx)
 	}
 }
 
@@ -127,16 +183,27 @@ func startGame(sCtx Context) echo.HandlerFunc {
 	return func(eCtx echo.Context) error {
 		code := eCtx.Param("code")
 
-		game, err := sCtx.Db.GetGame(code)
-		if err != nil {
-			return err
-		}
-
 		var form struct {
 			LightningAddress string `form:"lnaddr"`
 		}
 		if err := eCtx.Bind(&form); err != nil {
 			return err
+		}
+
+		game, err := sCtx.Db.GetGame(code)
+		if err != nil {
+			return err
+		}
+
+		tx, err := sCtx.Db.BeginTx(eCtx.Request().Context(), nil)
+		if err != nil {
+			return err
+		}
+
+		if started, err := tx.HasGameStarted(game.Id); err != nil {
+			return err
+		} else if started {
+			return echo.NewHTTPError(http.StatusBadRequest, "game already started")
 		}
 
 		formError := types.FormError{}
@@ -152,8 +219,10 @@ func startGame(sCtx Context) echo.HandlerFunc {
 			eCtx.Response().Header().Add("HX-Retarget", "#content")
 			eCtx.Response().Header().Add("HX-Reselect", "#content")
 			eCtx.Logger().Error(formError)
-			return pages.Render(pages.Game(game, formError), http.StatusBadRequest, eCtx)
+			return pages.Render(pages.GameInvite(game, formError), http.StatusBadRequest, eCtx)
 		}
+
+		// TODO: handle case with existing 'zapback: start game' invoice that will or already did expire
 
 		desc := "zapback: start game"
 		msats := game.ZapAmount
@@ -164,11 +233,6 @@ func startGame(sCtx Context) echo.HandlerFunc {
 		}
 
 		decoded, err := lightning.DecodePaymentRequest(pr)
-		if err != nil {
-			return err
-		}
-
-		tx, err := sCtx.Db.BeginTx(eCtx.Request().Context(), nil)
 		if err != nil {
 			return err
 		}

@@ -135,12 +135,12 @@ func (db *Db) GetInvoice(paymentHash string) (*Invoice, error) {
 	return &invoice, nil
 }
 
-func (db *Db) UpdateInvoice(id int, update *UpdateInvoice) error {
-	_, err := db.Exec(`
+func (tx *Tx) UpdateInvoice(id int, update *UpdateInvoice) error {
+	_, err := tx.Exec(`
 		UPDATE invoice
 		SET confirmed_at = $2
 		WHERE id = $1`,
-		id, update.ConfirmedAt,
+		id, update.ConfirmedAt.Time,
 	)
 	return err
 }
@@ -192,4 +192,50 @@ func (db *Db) GetPendingInvoices() ([]Invoice, error) {
 	}
 
 	return invoices, nil
+}
+
+func (tx *Tx) GetGameInvoice(id int) (*Invoice, error) {
+	row := tx.QueryRow(`
+		SELECT
+			invoice.id,
+			invoice.created_at,
+			invoice.expires_at,
+			invoice.payment_hash,
+			invoice.payment_request,
+			invoice.confirmed_at,
+			invoice.canceled_at,
+			invoice.msats_requested,
+			invoice.msats_received,
+			invoice.description,
+			invoice.player_id,
+			invoice.game_id,
+			game.code
+		FROM invoice
+		LEFT JOIN game ON invoice.game_id = game.id
+		WHERE game_id = $1
+		AND confirmed_at IS NULL
+		ORDER BY invoice.created_at DESC
+		LIMIT 1
+	`, id)
+
+	var invoice Invoice
+	if err := row.Scan(
+		&invoice.Id,
+		&invoice.CreatedAt,
+		&invoice.ExpiresAt,
+		&invoice.PaymentHash,
+		&invoice.PaymentRequest,
+		&invoice.ConfirmedAt,
+		&invoice.CanceledAt,
+		&invoice.MsatsRequested,
+		&invoice.MsatsReceived,
+		&invoice.Description,
+		&invoice.PlayerId,
+		&invoice.GameId,
+		&invoice.GameCode,
+	); err != nil {
+		return nil, err
+	}
+
+	return &invoice, nil
 }

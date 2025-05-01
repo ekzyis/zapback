@@ -22,6 +22,8 @@ func Render(t templ.Component, statusCode int, eCtx echo.Context) error {
 	defer templ.ReleaseBuffer(buf)
 
 	rCtx := context.WithValue(eCtx.Request().Context(), pCtx.Env, env.Env)
+	req := eCtx.Request()
+	rCtx = context.WithValue(rCtx, pCtx.Origin, req.Pattern+req.Host)
 
 	if err := t.Render(rCtx, buf); err != nil {
 		return err

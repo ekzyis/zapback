@@ -12,14 +12,28 @@ import (
 templ Invoice(invoice *db.Invoice) {
 	<div class="p-5 bg-background text-center font-mono">
 		<div class="mb-3 font-bold">Payment Required</div>
-		<div>{ invoice.Description.String }</div>
-		<div class="my-1">
-			@Qr(invoice.PaymentRequest, "lightning:"+invoice.PaymentRequest)
-		</div>
-		<div class="my-1">{ format(invoice.MsatsRequested) }</div>
-		@InvoiceStatus(invoice, nil)
-		<div class="none" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
+		@InvoiceDescription(invoice)
+		@InvoiceQr(invoice)
 	</div>
+}
+
+templ GameInvoice(invoice *db.Invoice) {
+	<div class="text-center font-mono">
+		@InvoiceQr(invoice)
+	</div>
+}
+
+templ InvoiceDescription(invoice *db.Invoice) {
+	<div>{ invoice.Description.String }</div>
+}
+
+templ InvoiceQr(invoice *db.Invoice) {
+	<div class="my-1">
+		@Qr(invoice.PaymentRequest, "lightning:"+invoice.PaymentRequest)
+	</div>
+	<div class="my-1">{ format(invoice.MsatsRequested) }</div>
+	@InvoiceStatus(invoice, nil)
+	<div class="none" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
 }
 
 templ InvoiceStatus(invoice *db.Invoice, redirectUrl *url.URL) {

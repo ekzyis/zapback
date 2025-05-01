@@ -40,15 +40,13 @@ func New(sCtx Context) *Server {
 
 	s.GET("/", index(sCtx))
 
-	s.GET("/game", newGame(sCtx))
+	s.GET("/game", gameForm(sCtx))
 	s.POST("/game", createGame(sCtx))
+	s.GET("/game/:code", game(sCtx))
+	s.POST("/game/:code", startGame(sCtx))
+
 	s.GET("/game/load", loadGame(sCtx))
 	s.POST("/game/load", loadGame(sCtx))
-
-	s.GET("/game/:code", game(sCtx))
-	s.POST("/game/:code/start", startGame(sCtx))
-	// TODO: implement game zaps
-	// s.POST("/game/:code/zap", zapGame(sCtx))
 
 	s.GET("/invoice/:payment_hash", invoiceStatus(sCtx))
 
