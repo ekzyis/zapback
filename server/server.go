@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"database/sql"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -63,6 +64,10 @@ func httpErrorHandler(sCtx Context) echo.HTTPErrorHandler {
 		)
 
 		eCtx.Logger().Error(err)
+
+		if err == sql.ErrNoRows {
+			code = http.StatusNotFound
+		}
 
 		if httpError, ok := err.(*echo.HTTPError); ok {
 			code = httpError.Code
