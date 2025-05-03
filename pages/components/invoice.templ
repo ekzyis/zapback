@@ -33,7 +33,7 @@ templ InvoiceQr(invoice *db.Invoice) {
 	</div>
 	<div class="my-1">{ format(invoice.MsatsRequested) }</div>
 	@InvoiceStatus(invoice, nil)
-	<div class="none" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
+	<div class="hidden" id="bolt11-data" bolt11-data={ templ.JSONString(invoice.PaymentRequest) }></div>
 }
 
 templ InvoiceStatus(invoice *db.Invoice, redirectUrl *url.URL) {

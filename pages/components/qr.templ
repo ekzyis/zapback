@@ -24,7 +24,7 @@ templ Qr(value string, href string) {
 
 templ CopyButton(value string) {
 	<button type="button" id="copy" class="ms-1 button w-[64px]" hx-preserve>copy</button>
-	<div class="none" id="copy-data" copy-data={ templ.JSONString(value) } hx-preserve></div>
+	<div class="hidden" id="copy-data" copy-data={ templ.JSONString(value) } hx-preserve></div>
 	<script type="text/javascript" id="copy-js" hx-preserve>
 		var value = JSON.parse($("#copy-data").getAttribute("copy-data"))
 		htmx.on("#copy", "click", function () {
