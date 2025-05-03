@@ -164,6 +164,20 @@ func game(sCtx Context) echo.HandlerFunc {
 				return err
 			}
 
+			expired := turn.Invoice.ExpiresAt.Before(time.Now())
+			if expired {
+				winner, err := tx.GetGameWinner(game.Id)
+				if err != nil {
+					return fmt.Errorf("failed to get game winner: %s", err.Error())
+				}
+
+				if err := tx.Commit(); err != nil {
+					return err
+				}
+
+				return pages.Render(pages.GameFinished(game, turn, winner), http.StatusOK, eCtx)
+			}
+
 			if err := tx.Commit(); err != nil {
 				return err
 			}

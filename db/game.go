@@ -112,3 +112,22 @@ func (tx *Tx) GetGameTurn(id int) (*Turn, error) {
 
 	return &Turn{Player: player, PoolAmount: poolAmount, Invoice: inv}, nil
 }
+
+func (tx *Tx) GetGameWinner(id int) (*Player, error) {
+	row := tx.QueryRow(`
+		SELECT player.id, player.lnaddr
+		FROM invoice
+		LEFT JOIN player ON invoice.player_id = player.id
+		WHERE invoice.game_id = $1
+		AND invoice.confirmed_at IS NOT NULL
+		ORDER BY invoice.created_at DESC
+		LIMIT 1
+	`, id)
+
+	var player Player
+	if err := row.Scan(&player.Id, &player.LightningAddress); err != nil {
+		return nil, err
+	}
+
+	return &player, nil
+}

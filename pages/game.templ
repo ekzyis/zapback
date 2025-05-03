@@ -165,8 +165,6 @@ templ GameInvite(g *db.Game, err types.FormError) {
     </html>
 }
 
-// TODO: show who won if invoice expired
-// TODO: show status of payout (pending or paid)
 templ Game(g *db.Game, t *db.Turn) {
     <html>
         @components.Head()
@@ -182,6 +180,33 @@ templ Game(g *db.Game, t *db.Turn) {
                     <div id="pool">{ fmt.Sprintf("%d sats", t.PoolAmount/1000) }</div>
                 </div>
                 @components.GameInvoice(t.Invoice)
+            }
+        }
+    </html>
+}
+
+templ GameFinished(g *db.Game, t *db.Turn, winner *db.Player) {
+    <html>
+        @components.Head()
+        @components.Body() {
+			@components.Content() {
+                <div id="banner">
+                    @components.Figlet("slant", "zapback")
+                </div>
+                <div class="grid grid-cols-[auto_auto] gap-x-4 items-center mb-4">
+                    <label for="turn">turn:</label>
+                    <div id="turn">{ t.Player.LightningAddress }</div>
+                    <label for="pool">pool:</label>
+                    <div id="pool">{ fmt.Sprintf("%d sats", t.PoolAmount/1000) }</div>
+                </div>
+                @components.GameInvoice(t.Invoice)
+                <div class="grid grid-cols-[auto_auto] gap-x-4 items-center my-4">
+                    <label for="turn" class="font-bold">winner:</label>
+                    <div id="turn" class="font-bold">{ winner.LightningAddress }</div>
+                    <div class="text-muted text-sm col-span-2 my-4">
+                        payouts are done manually for now
+                    </div>
+                </div>
             }
         }
     </html>
