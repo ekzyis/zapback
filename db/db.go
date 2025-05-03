@@ -52,6 +52,7 @@ func (d *Db) Migrate() error {
 		return err
 	}
 
+	// TODO: make sure msats_received is set if confirmed_at is set
 	if _, err := d.Exec(`
 		CREATE TABLE IF NOT EXISTS invoice (
 			id SERIAL PRIMARY KEY,

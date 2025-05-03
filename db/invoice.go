@@ -37,6 +37,7 @@ type UpdateInvoice struct {
 }
 
 func (tx *Tx) CreateInvoice(inv *CreateInvoice) (*Invoice, error) {
+	// TODO: insert msats_received
 	row := tx.QueryRow(`
 			INSERT INTO invoice (
 				created_at,

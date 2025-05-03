@@ -165,6 +165,8 @@ templ GameInvite(g *db.Game, err types.FormError) {
     </html>
 }
 
+// TODO: show who won if invoice expired
+// TODO: show status of payout (pending or paid)
 templ Game(g *db.Game, t *db.Turn) {
     <html>
         @components.Head()
