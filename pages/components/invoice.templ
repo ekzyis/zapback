@@ -58,6 +58,11 @@ templ InvoiceStatus(invoice *db.Invoice, redirectUrl *url.URL) {
             <!-- TODO: add PENDING -->
 			<div class="font-mono my-1" id="countdown" countdown-data={ templ.JSONString(math.Floor(invoice.ExpiresAt.Sub(time.Now()).Seconds())) } hx-preserve></div>
 			<script type="text/javascript" id="countdown-js" hx-preserve>
+                // Clear any existing interval for this countdown
+                if (window.countdown) {
+                    clearInterval(window.countdown)
+                }
+
                 var expiresIn = JSON.parse($("#countdown").getAttribute("countdown-data"))
 
                 function pad(num, places) {
@@ -74,12 +79,13 @@ templ InvoiceStatus(invoice *db.Invoice, redirectUrl *url.URL) {
                         expiresIn--
                     } catch {
                         // countdown element disappeared
-                        clearInterval(interval)
+                        clearInterval(window.countdown)
                     }
                 }
 
                 _countdown()
-                var interval = setInterval(_countdown, 1000)
+                // Store interval in window object so it can be cleared later
+                window.countdown = setInterval(_countdown, 1000)
             </script>
             <div
                 id="poll"
