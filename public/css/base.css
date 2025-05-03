@@ -145,7 +145,6 @@
   .neon {
     border: none;
     padding: 0.5em 3em;
-    transition: background-color 150ms ease-in, color 150ms ease-in;
   }
 
   .neon.success {
