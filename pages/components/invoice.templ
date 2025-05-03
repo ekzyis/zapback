@@ -88,7 +88,10 @@ templ InvoiceStatus(invoice *db.Invoice, redirectUrl *url.URL) {
                 hx-target="#status"
                 hx-swap="outerHTML"
                 hx-select="#status"
+                hx-push-url="false"
+                hx-indicator="#hide-indicator"
             ></div>
+            <div class="hidden" id="hide-indicator"></div>
 		}
 	</div>
 }
