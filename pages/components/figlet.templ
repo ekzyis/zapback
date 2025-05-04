@@ -3,7 +3,7 @@ package components
 import "github.com/ekzyis/zapback/lib"
 
 templ Figlet(font string, text string) {
-	<code class="figlet" hx-get="/" hx-target="#content" hx-select="#content">
+	<code class="figlet cursor-pointer" hx-get="/" hx-target="#content" hx-select="#content">
 		<strong>
 			<pre>
 				{ lib.Figlet(font, text) }
