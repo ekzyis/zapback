@@ -113,7 +113,7 @@ func nextInvoice(sCtx Context, tx *db.Tx, dbInv *db.Invoice) error {
 		return fmt.Errorf("failed to get game turn: %s", err.Error())
 	}
 
-	pr, err := sCtx.Ln.CreateInvoice(dbInv.MsatsRequested, "zapback: play game")
+	pr, err := sCtx.Ln.CreateInvoice(dbInv.MsatsRequested, "zapback: play game", time.Now().Add(24*time.Hour))
 	if err != nil {
 		return fmt.Errorf("failed to create lightning invoice: %s", err.Error())
 	}

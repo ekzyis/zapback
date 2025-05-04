@@ -62,7 +62,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 		desc := "zapback: new game"
 		msats := int64(form.ZapAmount * 1000)
 
-		pr, err := sCtx.Ln.CreateInvoice(msats, desc)
+		pr, err := sCtx.Ln.CreateInvoice(msats, desc, time.Now().Add(5*time.Minute))
 		if err != nil {
 			return err
 		}
@@ -240,8 +240,8 @@ func startGame(sCtx Context) echo.HandlerFunc {
 
 		desc := "zapback: start game"
 		msats := game.ZapAmount
-
-		pr, err := sCtx.Ln.CreateInvoice(msats, desc)
+		expiresAt := time.Now().Add(5 * time.Minute)
+		pr, err := sCtx.Ln.CreateInvoice(msats, desc, expiresAt)
 		if err != nil {
 			return err
 		}

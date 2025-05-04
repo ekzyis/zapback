@@ -47,10 +47,11 @@ func WithPhoenixdLimitedAccessToken(limitedAccessToken string) func(*Phoenixd) *
 	}
 }
 
-func (p *Phoenixd) CreateInvoice(msats int64, description string) (PaymentRequest, error) {
+func (p *Phoenixd) CreateInvoice(msats int64, description string, expiresAt time.Time) (PaymentRequest, error) {
 	values := url.Values{}
 	values.Add("amountSat", strconv.FormatInt(msats/1000, 10))
 	values.Add("description", description)
+	values.Add("expirySeconds", strconv.Itoa(int(time.Until(expiresAt).Seconds())))
 
 	endpoint := p.url.JoinPath("createinvoice")
 

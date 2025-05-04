@@ -9,7 +9,7 @@ import (
 type PaymentRequest string
 
 type Lightning interface {
-	CreateInvoice(msats int64, description string) (PaymentRequest, error)
+	CreateInvoice(msats int64, description string, expiresAt time.Time) (PaymentRequest, error)
 	GetInvoice(paymentHash string) (*Invoice, error)
 	// TODO: PayRequest(pr PaymentRequest) error
 }
