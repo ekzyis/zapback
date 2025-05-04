@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/ekzyis/zapback/db"
@@ -98,6 +99,7 @@ func createGame(sCtx Context) echo.HandlerFunc {
 			Description:    desc,
 			PlayerId:       player.Id,
 			GameId:         game.Id,
+			Type:           db.InvoiceTypeCreate,
 		})
 		if err != nil {
 			return err
@@ -236,8 +238,6 @@ func startGame(sCtx Context) echo.HandlerFunc {
 			return pages.Render(pages.GameInvite(game, formError), http.StatusBadRequest, eCtx)
 		}
 
-		// TODO: handle case with existing 'zapback: start game' invoice that will or already did expire
-
 		desc := "zapback: start game"
 		msats := game.ZapAmount
 
@@ -268,8 +268,17 @@ func startGame(sCtx Context) echo.HandlerFunc {
 			Description:    desc,
 			PlayerId:       player.Id,
 			GameId:         game.Id,
+			Type:           db.InvoiceTypeInvite,
 		})
 		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint \"invoice_unique_invite_per_game\"") {
+				formError["lnaddr"] = "invite no longer available"
+				eCtx.Response().Header().Add("HX-Retarget", "#content")
+				eCtx.Response().Header().Add("HX-Reselect", "#content")
+				eCtx.Logger().Error(formError)
+				return pages.Render(pages.GameInvite(game, formError), http.StatusBadRequest, eCtx)
+			}
+
 			return err
 		}
 

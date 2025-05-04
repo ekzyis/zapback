@@ -28,6 +28,9 @@ func worker(sCtx Context) error {
 			expired := invoice.ExpiresAt.Before(time.Now())
 			if expired {
 				logf("invoice expired: %s", invoice.PaymentHash)
+				if err := cancelInvoice(sCtx, &invoice); err != nil {
+					return err
+				}
 				continue
 			}
 
@@ -39,7 +42,7 @@ func worker(sCtx Context) error {
 
 			debugConfirmed := (env.Debug &&
 				time.Since(lightningInvoice.CreatedAt) >= 5*time.Second &&
-				invoice.Description.Valid && invoice.Description.String != "zapback: play game")
+				invoice.Type != db.InvoiceTypePlay)
 
 			if !lightningInvoice.ConfirmedAt.IsZero() || debugConfirmed {
 				confirmedAt := lightningInvoice.ConfirmedAt
@@ -130,6 +133,7 @@ func nextInvoice(sCtx Context, tx *db.Tx, dbInv *db.Invoice) error {
 		PlayerId:       turn.Player.Id,
 		MsatsRequested: decoded.Msats,
 		Description:    decoded.Description,
+		Type:           db.InvoiceTypePlay,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to insert invoice: %s", err.Error())
@@ -138,4 +142,23 @@ func nextInvoice(sCtx Context, tx *db.Tx, dbInv *db.Invoice) error {
 	logf("created next invoice: %s", decoded.PaymentHash)
 
 	return nil
+}
+
+func cancelInvoice(sCtx Context, dbInv *db.Invoice) error {
+	tx, err := sCtx.Db.BeginTx(context.Background(), nil)
+	if err != nil {
+		logf("failed to begin transaction: %s", err.Error())
+		return err
+	}
+
+	if err := tx.UpdateInvoice(dbInv.Id, &db.UpdateInvoice{
+		CanceledAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	}); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
