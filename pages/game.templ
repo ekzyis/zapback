@@ -5,7 +5,7 @@ import (
 	"github.com/ekzyis/zapback/pages/components"
 	"fmt"
 	"github.com/ekzyis/zapback/pages/types"
-	"github.com/ekzyis/zapback/pages/context"
+	_context "github.com/ekzyis/zapback/pages/context"
 )
 
 templ GameForm(err types.FormError) {
@@ -99,11 +99,11 @@ templ GameSendInvite(g *db.Game) {
                     </p>
                     <div class="flex justify-center">
                         <a
-                            href={ templ.SafeURL(fmt.Sprintf("https://%s/game/%s", context.GetOrigin(ctx), g.Code)) }
+                            href={ templ.SafeURL(fmt.Sprintf("https://%s/game/%s", _context.GetOrigin(ctx), g.Code)) }
                             class="flex justify-center break-all">
-                            { fmt.Sprintf("https://%s/game/%s", context.GetOrigin(ctx), g.Code) }
+                            { fmt.Sprintf("https://%s/game/%s", _context.GetOrigin(ctx), g.Code) }
                         </a>
-                        @components.CopyButton(fmt.Sprintf("https://%s/game/%s", context.GetOrigin(ctx), g.Code))
+                        @components.CopyButton(fmt.Sprintf("https://%s/game/%s", _context.GetOrigin(ctx), g.Code))
                     </div>
                     <p class="text-center text-muted text-sm mt-8">you won't see this page again after leaving</p>
                 </div>
