@@ -26,6 +26,9 @@ templ Head() {
 		if ctx.Value(c.Env) == "development" {
 			<script defer src="/js/livereload.js"></script>
 		}
+		if ctx.Value(c.Env) == "production" {
+			<script defer data-domain="zapback.ekzy.is" src="/js/plausible.js"></script>
+		}
 		<script type="text/javascript">
 			// helper functions
 			var $ = selector => document.querySelector(selector)
