@@ -17,7 +17,7 @@ func logf(format string, a ...any) {
 }
 
 func worker(sCtx Context) error {
-	for {
+	checkInvoices := func() error {
 		invoices, err := sCtx.Db.GetPendingInvoices()
 		if err != nil {
 			return err
@@ -62,6 +62,14 @@ func worker(sCtx Context) error {
 			}
 
 			logf("invoice pending: %s", invoice.PaymentHash)
+		}
+
+		return nil
+	}
+
+	for {
+		if err := checkInvoices(); err != nil {
+			logf("failed to check invoices: %w", err)
 		}
 
 		time.Sleep(5 * time.Second)
