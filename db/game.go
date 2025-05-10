@@ -26,6 +26,15 @@ type Turn struct {
 	Invoice *Invoice
 }
 
+type GameStatus struct {
+	Id         int
+	CreatedAt  time.Time
+	Code       string
+	PoolAmount int64
+	Status     string
+	Expired    bool
+}
+
 func (tx *Tx) CreateGame(g *CreateGame) (*Game, error) {
 	row := tx.QueryRow(`
 		INSERT INTO game (zap_amount)
@@ -130,4 +139,54 @@ func (tx *Tx) GetGameWinner(id int) (*Player, error) {
 	}
 
 	return &player, nil
+}
+
+func (db *Db) GetGameStats() ([]*GameStatus, error) {
+	rows, err := db.Query(`
+		WITH
+			pool AS (
+				SELECT
+					game.id,
+					COALESCE(
+						SUM(invoice.msats_requested) FILTER (WHERE invoice.confirmed_at IS NOT NULL),
+						0
+					) as pool_amount
+				FROM game
+				LEFT JOIN invoice ON invoice.game_id = game.id
+				GROUP BY game.id
+			),
+			latest_invoice AS (
+				SELECT DISTINCT ON (i.game_id)
+					i.*
+				FROM invoice i
+				ORDER BY i.game_id, i.created_at DESC
+			),
+			status AS (
+				SELECT
+					g.id, g.created_at, g.code,
+					p.pool_amount,
+					li.type AS status,
+					li.expires_at <= NOW() as expired
+				FROM game g
+				LEFT JOIN pool p ON p.id = g.id
+				LEFT JOIN latest_invoice li ON li.game_id = g.id
+				ORDER BY g.id DESC
+			)
+		SELECT id, created_at, code, pool_amount, status, expired
+		FROM status
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	var stats []*GameStatus
+	for rows.Next() {
+		var status GameStatus
+		if err := rows.Scan(&status.Id, &status.CreatedAt, &status.Code, &status.PoolAmount, &status.Status, &status.Expired); err != nil {
+			return nil, err
+		}
+		stats = append(stats, &status)
+	}
+
+	return stats, nil
 }

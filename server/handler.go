@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ekzyis/zapback/db"
+	"github.com/ekzyis/zapback/env"
 	"github.com/ekzyis/zapback/lightning"
 	"github.com/ekzyis/zapback/lightning/lnurl"
 	"github.com/ekzyis/zapback/pages"
@@ -328,5 +329,31 @@ func invoiceStatus(sCtx Context) echo.HandlerFunc {
 		}
 
 		return pages.Render(components.InvoiceStatus(inv, redirectUrl), http.StatusOK, eCtx)
+	}
+}
+
+func admin(sCtx Context) echo.HandlerFunc {
+	return func(eCtx echo.Context) error {
+		if env.AdminAuth == "" {
+			return echo.NewHTTPError(http.StatusServiceUnavailable)
+		}
+
+		username, password, ok := eCtx.Request().BasicAuth()
+		if !ok {
+			eCtx.Response().Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+			return echo.NewHTTPError(http.StatusUnauthorized)
+		}
+
+		parts := strings.Split(env.AdminAuth, ":")
+		if username != parts[0] || password != parts[1] {
+			return echo.NewHTTPError(http.StatusUnauthorized)
+		}
+
+		stats, err := sCtx.Db.GetGameStats()
+		if err != nil {
+			return err
+		}
+
+		return pages.Render(pages.Admin(stats), http.StatusOK, eCtx)
 	}
 }

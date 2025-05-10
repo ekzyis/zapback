@@ -42,7 +42,7 @@ func worker(sCtx Context) error {
 
 			debugConfirmed := (env.Debug &&
 				time.Since(lightningInvoice.CreatedAt) >= 5*time.Second &&
-				invoice.Type != db.InvoiceTypePlay)
+				invoice.Type != db.InvoiceTypePlay) && false
 
 			if !lightningInvoice.ConfirmedAt.IsZero() || debugConfirmed {
 				confirmedAt := lightningInvoice.ConfirmedAt

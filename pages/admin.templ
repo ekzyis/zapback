@@ -1,0 +1,55 @@
+package pages
+
+import (
+	"github.com/ekzyis/zapback/db"
+	"github.com/ekzyis/zapback/pages/components"
+	"strconv"
+	"github.com/dustin/go-humanize"
+	"fmt"
+)
+
+templ Admin(stats []*db.GameStatus) {
+    <html>
+        @components.Head()
+        @components.Body() {
+			@components.Content() {
+                <div id="banner">
+                    @components.Figlet("slant", "admin")
+                </div>
+                <div class="overflow-x-auto">
+                    <div class="grid grid-cols-4">
+                        <div class="font-bold px-2 py-1 my-2 border-b border-white">Code</div>
+                        <div class="font-bold px-2 py-1 my-2 border-b border-white">Created</div>
+                        <div class="font-bold px-2 py-1 my-2 border-b border-white">Pool</div>
+                        <div class="font-bold px-2 py-1 my-2 border-b border-white">Status</div>
+                        for _, status := range stats {
+                            <div class="border-b px-2 py-1 border-muted break-words">
+                                <a
+                                    href={ templ.SafeURL(fmt.Sprintf("/game/%s", status.Code)) }
+                                    hx-get={ fmt.Sprintf("/game/%s", status.Code) }
+                                    hx-select="#content"
+                                    hx-target="#content">
+                                    { status.Code[:6] }
+                                </a>
+                            </div>
+                            <div class="border-b px-2 py-1 border-muted">
+                                { humanize.Time(status.CreatedAt) }
+                            </div>
+                            <div class="border-b px-2 py-1 border-muted">
+                                { strconv.FormatInt(status.PoolAmount / 1000, 10) } sats
+                            </div>
+                            <div class="border-b px-2 py-1 border-muted font-mono">
+                                { status.Status }
+                                if status.Expired {
+                                    ⌛
+                                } else {
+                                    ⏳
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </html>
+}

@@ -22,6 +22,7 @@ var (
 	PostgresUrl                string
 	PostgresUrlWithoutPassword string
 	Debug                      bool
+	AdminAuth                  string
 )
 
 func Load(filenames ...string) error {
@@ -34,6 +35,7 @@ func Load(filenames ...string) error {
 	flag.StringVar(&PhoenixdLimitedAccessToken, "PHOENIXD_LIMITED_ACCESS_TOKEN", "", "Phoenixd limited access token")
 	flag.StringVar(&PostgresUrl, "POSTGRES_DB", "", "PostgreSQL connection URL")
 	flag.StringVar(&Env, "ENV", "development", "Build environment")
+	flag.StringVar(&AdminAuth, "ADMIN_AUTH", "", "Admin auth")
 	return nil
 }
 
